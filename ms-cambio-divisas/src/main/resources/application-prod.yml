@@ -1,0 +1,31 @@
+# Perfil productivo: sin valores por defecto para secretos (si faltan, el servicio no arranca).
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate   # el esquema lo gestiona Flyway/Liquibase (siguiente iteracion)
+  sql:
+    init:
+      mode: never
+  rabbitmq:
+    host: ${RABBIT_HOST}
+    username: ${RABBIT_USER}
+    password: ${RABBIT_PASSWORD}
+    publisher-confirm-type: correlated
+    publisher-returns: true
+app:
+  mensajeria:
+    modo: rabbit
+  integraciones:
+    clientes:
+      modo: feign
+  seguridad:
+    jwt-secret: ${JWT_SECRET}
+    demo-password: ${APP_DEMO_PASSWORD}
+management:
+  health:
+    rabbit:
+      enabled: true

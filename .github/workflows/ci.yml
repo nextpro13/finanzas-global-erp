@@ -1,0 +1,62 @@
+name: CI - ms-cambio-divisas
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main, develop ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: ms-cambio-divisas
+
+jobs:
+  build-test:
+    name: Compilar, probar y medir cobertura
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. Descargar codigo
+        uses: actions/checkout@v4
+
+      - name: 2. Configurar JDK 21 + cache Maven
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: 3. Compilar (Maven descarga dependencias)
+        run: mvn -B -ntp clean compile
+
+      - name: 4. Pruebas JUnit + Spring Boot Test + JaCoCo (umbral 70 %)
+        run: mvn -B -ntp verify
+
+      - name: 5. Publicar reportes de pruebas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: ms-cambio-divisas/target/surefire-reports/
+
+      - name: 6. Publicar reporte de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: ms-cambio-divisas/target/site/jacoco/
+
+  docker:
+    name: Construir imagen Docker
+    needs: build-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construir imagen (preparado para CD)
+        run: docker build -t ms-cambio-divisas:${{ github.sha }} .

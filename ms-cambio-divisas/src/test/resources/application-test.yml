@@ -1,0 +1,4 @@
+app:
+  seguridad:
+    jwt-secret: test-secret-para-pruebas-automatizadas-0123456789
+    demo-password: Test#2026

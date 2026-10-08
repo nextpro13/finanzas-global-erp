@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: ms-cambio-divisas
+  datasource:
+    url: jdbc:h2:mem:divisas;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ""
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connect-timeout: 2000   # ms: evita bloquear la caja si ms-clientes no responde
+            read-timeout: 3000
+
+server:
+  port: 8082
+  error:
+    include-stacktrace: never
+    include-message: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  health:
+    rabbit:
+      enabled: false
+
+app:
+  negocio:
+    comision-porcentaje: 0.50        # 0.5 % sobre el importe en soles
+    limite-sin-aprobacion: 30000.00  # PEN: por encima requiere supervisor
+  integraciones:
+    clientes:
+      modo: ${CLIENTES_MODO:local}   # local | feign
+      url: ${CLIENTES_URL:http://localhost:8081}
+  mensajeria:
+    modo: ${MENSAJERIA_MODO:log}     # log | rabbit
+  seguridad:
+    # Valores por defecto SOLO para desarrollo. En prod se exigen por variable de entorno.
+    jwt-secret: ${JWT_SECRET:dev-only-secret-cambiar-en-produccion-2026!!}
+    jwt-issuer: finanzas-global-auth
+    jwt-expiracion-minutos: 30
+    demo-password: ${APP_DEMO_PASSWORD:Demo#2026}
+    usuarios:
+      - { usuario: cajero01,     roles: [CAJERO],     oficina: LIMA-01 }
+      - { usuario: supervisor01, roles: [SUPERVISOR], oficina: LIMA-01 }
+      - { usuario: supervisor02, roles: [SUPERVISOR], oficina: LIMA-02 }
+      - { usuario: admin01,      roles: [ADMIN],      oficina: CENTRAL }
+      - { usuario: auditor01,    roles: [AUDITOR],    oficina: CENTRAL }
+
+logging:
+  level:
+    AUDITORIA: INFO
