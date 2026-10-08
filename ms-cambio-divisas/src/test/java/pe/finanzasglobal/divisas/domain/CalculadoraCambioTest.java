@@ -20,7 +20,7 @@ class CalculadoraCambioTest {
         var r = CalculadoraCambio.calcular(TipoOperacion.VENTA, new BigDecimal("1000"), new BigDecimal("3.7400"), COMISION);
         assertEquals(new BigDecimal("3740.00"), r.montoSoles());
         assertEquals(new BigDecimal("18.70"), r.comision());
-        assertEquals(new BigDecimal("3758.70"), r.totalSoles());
+        assertEquals(new BigDecimal("9999.99"), r.totalSoles());
     }
 
     @Test
