@@ -28,3 +28,4 @@ docker compose --env-file .env up --build   # PostgreSQL + RabbitMQ + servicio (
 | POST | /api/v1/operaciones (header `Idempotency-Key`) | CAJERO, SUPERVISOR |
 | GET | /api/v1/operaciones/{id} | CAJERO, SUPERVISOR, ADMIN, AUDITOR |
 | POST | /api/v1/operaciones/{id}/aprobar | SUPERVISOR |
+Pipeline de CI activo con GitHub Actions.
